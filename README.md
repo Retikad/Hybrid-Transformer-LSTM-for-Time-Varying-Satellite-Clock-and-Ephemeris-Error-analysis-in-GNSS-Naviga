@@ -38,7 +38,8 @@ Hybrid-Transformer-LSTM-for-GNSS/
 │   └── demo.py                     # Quick demo (fast, fewer epochs)
 │
 ├── docs/
-│   └── README.md (detailed documentation)
+│   ├── index.html                # GitHub Pages public site
+│   └── styles.css                # GitHub Pages styling
 │
 ├── results/                        # Auto-generated plots and CSV
 │   ├── *_predictions.png
@@ -53,6 +54,24 @@ Hybrid-Transformer-LSTM-for-GNSS/
 ├── demo_vedio_link.txt            # Demo/tutorial video link
 └── architecture.png               # Model architecture diagram
 ```
+
+---
+
+## Public Deployment (GitHub Pages)
+
+You can publish a public project page directly from this repository:
+
+1. Open repository Settings on GitHub.
+2. Go to Pages.
+3. Under Build and deployment, set Source to Deploy from a branch.
+4. Select Branch: main and Folder: /docs.
+5. Save and wait 1-2 minutes.
+
+Your site URL will be:
+
+https://retikad.github.io/Hybrid-Transformer-LSTM-for-Time-Varying-Satellite-Clock-and-Ephemeris-Error-analysis-in-GNSS-Naviga/
+
+Note: GitHub Pages hosts static content only. The Flask backend remains for local execution or cloud backend hosting (Render/Railway).
 
 ---
 
