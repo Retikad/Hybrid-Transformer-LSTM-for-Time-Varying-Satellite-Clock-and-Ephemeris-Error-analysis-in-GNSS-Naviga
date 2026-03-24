@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GNSS Error Prediction Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <h1>🛰️ GNSS Error Predictor</h1>
+                <p class="subtitle">M.Tech Research Dashboard</p>
+            </div>
+            <div class="nav-links">
+                <a href="#upload" class="nav-link">Upload</a>
+                <a href="#train" class="nav-link">Train</a>
+                <a href="#results" class="nav-link">Results</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container main-content">
+        
+        <!-- Upload Section -->
+        <section id="upload" class="card">
+            <h2>📁 Step 1: Upload Data</h2>
+            <p class="section-desc">Upload your GNSS error CSV file or use our demo dataset</p>
+            
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📥</div>
+                <p>Drag and drop your CSV file here</p>
+                <p class="or-text">OR</p>
+                <input type="file" id="fileInput" accept=".csv" hidden>
+                <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                    Choose File
+                </button>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="downloadDemoData()">
+                    📊 Download Demo Data
+                </button>
+            </div>
+
+            <div id="fileInfo" class="file-info" style="display: none;">
+                <h3>File Loaded ✓</h3>
+                <p><strong>Filename:</strong> <span id="fileName"></span></p>
+                <p><strong>Rows:</strong> <span id="fileRows"></span></p>
+                <p><strong>Columns:</strong> <span id="fileCols"></span></p>
+                <button class="btn btn-secondary btn-sm" onclick="changeFile()">Change File</button>
+            </div>
+        </section>
+
+        <!-- Train Section -->
+        <section id="train" class="card">
+            <h2>🚀 Step 2: Train Model</h2>
+            <p class="section-desc">Configure and train your GNSS error prediction model</p>
+            
+            <div class="form-group">
+                <label for="satelliteId">Satellite ID:</label>
+                <input type="text" id="satelliteId" value="MEO_01" placeholder="e.g., MEO_01">
+            </div>
+
+            <div class="form-group">
+                <label for="modelType">Model Type:</label>
+                <select id="modelType">
+                    <option value="lstm">LSTM (Baseline)</option>
+                    <option value="transformer">Transformer (Advanced)</option>
+                    <option value="hybrid" selected>Hybrid LSTM-Transformer (Best)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="epochs">Epochs:</label>
+                <input type="number" id="epochs" value="50" min="1" max="500">
+            </div>
+
+            <button class="btn btn-success btn-lg" id="trainBtn" onclick="startTraining()" disabled>
+                🎯 Start Training
+            </button>
+
+            <!-- Training Progress -->
+            <div id="trainingProgress" style="display: none;" class="progress-section">
+                <h3>Training in Progress...</h3>
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill"></div>
+                </div>
+                <p id="progressText">Initializing...</p>
+            </div>
+
+            <!-- Training Results -->
+            <div id="trainingResults" style="display: none;" class="results-box">
+                <h3>✓ Training Complete</h3>
+                <div class="metrics-grid">
+                    <div class="metric">
+                        <p class="metric-label">RMSE</p>
+                        <p class="metric-value" id="metricRMSE">-</p>
+                    </div>
+                    <div class="metric">
+                        <p class="metric-label">MAE</p>
+                        <p class="metric-value" id="metricMAE">-</p>
+                    </div>
+                    <div class="metric">
+                        <p class="metric-label">R² Score</p>
+                        <p class="metric-value" id="metricR2">-</p>
+                    </div>
+                </div>
+                <div class="sample-stats">
+                    <p><strong>Train Samples:</strong> <span id="trainSamples">-</span></p>
+                    <p><strong>Test Samples:</strong> <span id="testSamples">-</span></p>
+                    <p><strong>Model Type:</strong> <span id="resultModelType">-</span></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Predictions Section -->
+        <section id="predictions" class="card">
+            <h2>🔮 Step 3: Make Predictions</h2>
+            <p class="section-desc">Generate predictions on new data</p>
+            
+            <button class="btn btn-info" id="predictBtn" onclick="makePredictions()" disabled>
+                🔍 Generate Predictions
+            </button>
+
+            <div id="predictionResults" style="display: none;" class="results-box">
+                <h3>Prediction Results</h3>
+                <canvas id="predictionChart" width="400" height="100"></canvas>
+            </div>
+        </section>
+
+        <!-- Information Section -->
+        <section id="results" class="card info-section">
+            <h2>📚 About This Dashboard</h2>
+            
+            <div class="info-grid">
+                <div class="info-box">
+                    <h3>🎯 LSTM Model</h3>
+                    <p>Baseline sequential model for time-series prediction. Good for capturing temporal patterns.</p>
+                </div>
+                <div class="info-box">
+                    <h3>🔄 Transformer</h3>
+                    <p>State-of-the-art attention mechanism. Captures long-range dependencies in GNSS data.</p>
+                </div>
+                <div class="info-box">
+                    <h3>⭐ Hybrid Model</h3>
+                    <p>Novel combination of LSTM and Transformer. Best performance on GNSS error prediction.</p>
+                </div>
+            </div>
+
+            <div class="info-section-content">
+                <h3>📊 ISRO Evaluation Metrics</h3>
+                <ul>
+                    <li><strong>RMSE:</strong> Root Mean Squared Error - primary metric</li>
+                    <li><strong>MAE:</strong> Mean Absolute Error - average prediction error</li>
+                    <li><strong>R² Score:</strong> Coefficient of determination (0-1)</li>
+                    <li><strong>Validity Periods:</strong> 15min, 30min, 1hr, 2hr, 24hr</li>
+                </ul>
+
+                <h3>💾 Data Requirements</h3>
+                <p>Your CSV file should contain GNSS error data with columns such as:</p>
+                <ul>
+                    <li>timestamp / time</li>
+                    <li>satellite_id / prn</li>
+                    <li>broadcast_values</li>
+                    <li>modeled_values</li>
+                    <li>error (target)</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>GNSS Error Prediction Dashboard | M.Tech Research Project | ISRO SIH</p>
+            <p>GitHub: <a href="https://github.com/Retikad" target="_blank">Retikad</a></p>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
